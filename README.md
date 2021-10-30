@@ -86,7 +86,7 @@ can have relatively clean reflection code while still properly remapping.
 >   BlockPos findLightningTargetAround(ServerLevel instance, BlockPos pos);
 >
 >   @FieldSetter("sleepStatus")
->   SleepStatus setSleepStatus(ServerLevel instance, SleepStatus value);
+>   void setSleepStatus(ServerLevel instance, SleepStatus value);
 > }
 > ```
 >
