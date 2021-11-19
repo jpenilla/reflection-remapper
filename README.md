@@ -47,7 +47,7 @@ There are currently no release builds.
 > ```java
 > final Path mappingsFile = /* get path to mappings ... */;
 > // ReflectionRemapper provides various static factory methods, in this example we use the one from a Path
-> // Note that the standard ReflectionRemapper implementations store their mappings in memory, which can be multuple megabytes large in some cases.
+> // Note that the standard ReflectionRemapper implementations store their mappings in memory, which can be multiple megabytes large in some cases.
 > // This means it's best to use the remapper when your program starts and then dispose of any reference to it, so it can be garbage collected.
 > final ReflectionRemapper reflectionRemapper = ReflectionRemapper.forMappings(mappingsFile, "fromNamespace", "toNamespace");
 >
