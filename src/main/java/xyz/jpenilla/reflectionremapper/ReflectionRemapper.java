@@ -20,6 +20,7 @@ package xyz.jpenilla.reflectionremapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -179,12 +180,16 @@ public interface ReflectionRemapper {
     }
 
     final Class<?> bukkitClass;
+    final Method getServerMethod;
+    final Class<?> craftServerClass;
     try {
       bukkitClass = Class.forName("org.bukkit.Bukkit");
-    } catch (final ClassNotFoundException e) {
+      getServerMethod = bukkitClass.getDeclaredMethod("getServer");
+      craftServerClass = getServerMethod.invoke(null).getClass();
+    } catch (final ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
-    final @Nullable InputStream reobfIn = bukkitClass.getClassLoader().getResourceAsStream("META-INF/mappings/reobf.tiny");
+    final @Nullable InputStream reobfIn = craftServerClass.getClassLoader().getResourceAsStream("META-INF/mappings/reobf.tiny");
     if (reobfIn == null) {
       throw new IllegalStateException("Could not find mappings in expected location.");
     }
