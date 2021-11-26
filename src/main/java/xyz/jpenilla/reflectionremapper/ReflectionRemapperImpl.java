@@ -53,7 +53,7 @@ final class ReflectionRemapperImpl implements ReflectionRemapper {
     if (clsMap == null) {
       return fieldName;
     }
-    return clsMap.fieldsDeobfToObf().get(fieldName);
+    return clsMap.fieldsDeobfToObf().getOrDefault(fieldName, fieldName);
   }
 
   @Override
@@ -62,7 +62,7 @@ final class ReflectionRemapperImpl implements ReflectionRemapper {
     if (clsMap == null) {
       return methodName;
     }
-    return clsMap.methods().get(methodKey(methodName, paramTypes));
+    return clsMap.methods().getOrDefault(methodKey(methodName, paramTypes), methodName);
   }
 
   private static String methodKey(final String deobfName, final Class<?>... paramTypes) {
