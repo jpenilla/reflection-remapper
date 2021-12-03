@@ -17,8 +17,9 @@ dependencies {
 
   implementation(projects.reflectionRemapper)
 
-  implementation("cloud.commandframework", "cloud-paper", "1.5.0")
-  implementation("cloud.commandframework", "cloud-minecraft-extras", "1.5.0") {
+  implementation(platform("cloud.commandframework:cloud-bom:1.6.0"))
+  implementation("cloud.commandframework", "cloud-paper")
+  implementation("cloud.commandframework", "cloud-minecraft-extras") {
     isTransitive = false // Paper provides adventure
   }
 }
