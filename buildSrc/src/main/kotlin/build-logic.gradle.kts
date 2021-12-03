@@ -19,10 +19,12 @@ tasks {
     dependsOn(extractMappings)
   }
   withType<Test> {
-    inputs.files(memoryMeasurer)
-    dependsOn(extractMappings)
-    doFirst {
-      jvmArgs("-javaagent:${memoryMeasurer.asFileTree.singleFile.path}")
+    if (!name.contains("Java8")) {
+      inputs.files(memoryMeasurer)
+      doFirst {
+        jvmArgs("-javaagent:${memoryMeasurer.asFileTree.singleFile.path}")
+      }
     }
+    dependsOn(extractMappings)
   }
 }

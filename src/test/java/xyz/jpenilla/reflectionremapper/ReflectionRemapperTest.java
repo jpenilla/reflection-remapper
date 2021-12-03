@@ -17,11 +17,7 @@
  */
 package xyz.jpenilla.reflectionremapper;
 
-import com.volkhart.memory.MemoryMeasurer;
-import java.io.IOException;
-import java.io.InputStream;
 import org.junit.jupiter.api.Test;
-import xyz.jpenilla.reflectionremapper.internal.util.Util;
 import xyz.jpenilla.reflectionremapper.proxy.ReflectionProxyFactory;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.ConstructorInvoker;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.FieldGetter;
@@ -35,30 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ReflectionRemapperTest {
-  @Test
-  void testMappingsLoadingAndSize() {
-    final long start = System.nanoTime();
-
-    final ReflectionRemapper remapper;
-    try (final InputStream mappings = this.getClass().getClassLoader().getResourceAsStream("mappings.tiny")) {
-      if (mappings == null) {
-        throw new IllegalStateException("mappings.tiny not found");
-      }
-      remapper = ReflectionRemapper.forPaperReobfMappings(mappings);
-    } catch (final IOException ex) {
-      Util.sneakyThrow(ex);
-      return;
-    }
-
-    final long diff = System.nanoTime() - start;
-    System.out.println(diff / 1000000000.00D + "s");
-
-    System.out.println(MemoryMeasurer.measureBytes(remapper) / 1000.0D / 1000.0D + "MB");
-
-    final String serverPlayer = remapper.remapClassName("net.minecraft.server.level.ServerPlayer");
-    assertEquals("net.minecraft.server.level.EntityPlayer", serverPlayer);
-  }
-
   private ReflectionProxyFactory factory() {
     return ReflectionProxyFactory.create(
       ReflectionRemapper.noop(),
