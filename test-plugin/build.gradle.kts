@@ -1,13 +1,19 @@
 plugins {
   `base-conventions`
   id("io.papermc.paperweight.userdev")
-  id("xyz.jpenilla.run-paper") version "1.0.4"
+  id("xyz.jpenilla.run-paper") version "1.0.5"
   id("net.minecrell.plugin-yml.bukkit") version "0.5.0"
   id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
+indra {
+  javaVersions {
+    target(17)
+  }
+}
+
 dependencies {
-  paperDevBundle("1.17.1-R0.1-SNAPSHOT")
+  paperDevBundle("1.18-R0.1-SNAPSHOT")
 
   implementation(projects.reflectionRemapper)
 
@@ -32,6 +38,6 @@ tasks {
 bukkit {
   name = "ReflectionRemapperTest"
   main = "xyz.jpenilla.reflectionremapper.testplugin.TestPlugin"
-  apiVersion = "1.17"
+  apiVersion = "1.18"
   authors = listOf("jmp")
 }

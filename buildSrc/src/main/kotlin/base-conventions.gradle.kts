@@ -12,7 +12,10 @@ if (project != rootProject) {
 }
 
 indra {
-  javaVersions().target(16)
+  javaVersions {
+    minimumToolchain(17)
+    target(8)
+  }
 }
 
 license {
@@ -39,7 +42,7 @@ repositories {
 }
 
 dependencies {
-  compileOnlyApi("org.checkerframework", "checker-qual", "3.18.1")
+  compileOnlyApi("org.checkerframework", "checker-qual", "3.19.0")
 
   testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.1")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")

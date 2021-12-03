@@ -19,7 +19,6 @@ package xyz.jpenilla.reflectionremapper.proxy;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -39,6 +38,8 @@ import xyz.jpenilla.reflectionremapper.proxy.annotation.FieldSetter;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.MethodName;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.Static;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.Type;
+
+import static xyz.jpenilla.reflectionremapper.internal.util.Util.handleForDefaultMethod;
 
 final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
@@ -72,8 +73,7 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
     } else if (isHashCodeMethod(method)) {
       return 0;
     } else if (isToStringMethod(method)) {
-      return "ReflectionProxy[interface=%s, implementation=%s, proxies=%s]"
-        .formatted(this.interfaceClass.getTypeName(), proxy.getClass().getTypeName(), this.proxiedClass.getTypeName());
+      return String.format("ReflectionProxy[interface=%s, implementation=%s, proxies=%s]", this.interfaceClass.getTypeName(), proxy.getClass().getTypeName(), this.proxiedClass.getTypeName());
     }
 
     if (args == null) {
@@ -116,14 +116,7 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
     final MethodHandle handle = this.methodHandles.computeIfAbsent(
       method,
       m -> Util.sneakyThrows(
-        () -> MethodHandles.privateLookupIn(proxy.getClass(), LOOKUP)
-          .findSpecial(
-            this.interfaceClass,
-            m.getName(),
-            MethodType.methodType(m.getReturnType(), m.getParameterTypes()),
-            this.interfaceClass
-          )
-          .bindTo(proxy)
+        () -> handleForDefaultMethod(this.interfaceClass, proxy, method)
       )
     );
 
@@ -206,8 +199,7 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
   private static void checkParameterCount(final Method method, final Class<?> holder, final int expected, final String message) {
     if (method.getParameterCount() != expected) {
       throw new IllegalArgumentException(
-        "Unexpected amount of parameters for method %s in %s, got %d while expecting %d. %s"
-          .formatted(method.getName(), holder.getTypeName(), method.getParameterCount(), expected, message)
+        String.format("Unexpected amount of parameters for method %s in %s, got %d while expecting %d. %s", method.getName(), holder.getTypeName(), method.getParameterCount(), expected, message)
       );
     }
   }
@@ -242,8 +234,10 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
     } catch (final NoSuchFieldException e) {
       throw new IllegalArgumentException("Could not find field '" + fieldName + "' in " + holder.getTypeName(), e);
     }
-    if (!field.trySetAccessible()) {
-      throw new IllegalStateException("Could not set access for field '" + fieldName + "' in " + holder.getTypeName());
+    try {
+      field.setAccessible(true);
+    } catch (final Exception ex) {
+      throw new IllegalStateException("Could not set access for field '" + fieldName + "' in " + holder.getTypeName(), ex);
     }
     return field;
   }
@@ -262,8 +256,10 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
     } catch (final NoSuchMethodException ex) {
       throw new IllegalArgumentException("Could not find constructor of " + this.proxiedClass.getTypeName() + " with parameter types " + Arrays.toString(method.getParameterTypes()), ex);
     }
-    if (!constructor.trySetAccessible()) {
-      throw new IllegalStateException("Could not set access for proxy method target constructor of " + this.proxiedClass.getTypeName() + " with parameter types " + Arrays.toString(method.getParameterTypes()));
+    try {
+      constructor.setAccessible(true);
+    } catch (final Exception ex) {
+      throw new IllegalStateException("Could not set access for proxy method target constructor of " + this.proxiedClass.getTypeName() + " with parameter types " + Arrays.toString(method.getParameterTypes()), ex);
     }
     return constructor;
   }
@@ -295,8 +291,10 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException("Could not find proxy method target method: " + this.proxiedClass.getTypeName() + " " + methodName);
     }
-    if (!proxiedMethod.trySetAccessible()) {
-      throw new IllegalStateException("Could not set access for proxy method target method: " + this.proxiedClass.getTypeName() + " " + methodName);
+    try {
+      proxiedMethod.setAccessible(true);
+    } catch (final Exception ex) {
+      throw new IllegalStateException("Could not set access for proxy method target method: " + this.proxiedClass.getTypeName() + " " + methodName, ex);
     }
 
     return proxiedMethod;

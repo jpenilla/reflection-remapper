@@ -17,16 +17,21 @@
  */
 package xyz.jpenilla.reflectionremapper;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import net.fabricmc.mappingio.tree.MappingTree;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.DefaultQualifier;
 import xyz.jpenilla.reflectionremapper.internal.util.StringPool;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+import static xyz.jpenilla.reflectionremapper.internal.util.Util.descriptorString;
 
 @DefaultQualifier(NonNull.class)
 final class ReflectionRemapperImpl implements ReflectionRemapper {
@@ -34,8 +39,12 @@ final class ReflectionRemapperImpl implements ReflectionRemapper {
   private final Map<String, ClassMapping> mappingsByDeobf;
 
   private ReflectionRemapperImpl(final Set<ClassMapping> mappings) {
-    this.mappingsByObf = mappings.stream().collect(Collectors.toUnmodifiableMap(ClassMapping::obfName, map -> map));
-    this.mappingsByDeobf = mappings.stream().collect(Collectors.toUnmodifiableMap(ClassMapping::deobfName, map -> map));
+    this.mappingsByObf = Collections.unmodifiableMap(
+      mappings.stream().collect(toMap(ClassMapping::obfName, identity()))
+    );
+    this.mappingsByDeobf = Collections.unmodifiableMap(
+      mappings.stream().collect(toMap(ClassMapping::deobfName, identity()))
+    );
   }
 
   @Override
@@ -76,7 +85,7 @@ final class ReflectionRemapperImpl implements ReflectionRemapper {
   private static String paramsDescriptor(final Class<?>... params) {
     final StringBuilder builder = new StringBuilder();
     for (final Class<?> param : params) {
-      builder.append(param.descriptorString());
+      builder.append(descriptorString(param));
     }
     return builder.toString();
   }
@@ -86,13 +95,6 @@ final class ReflectionRemapperImpl implements ReflectionRemapper {
     ret = ret.substring(0, ret.indexOf(")"));
     return ret;
   }
-
-  private record ClassMapping(
-    String obfName,
-    String deobfName,
-    Map<String, String> fieldsDeobfToObf,
-    Map<String, String> methods // deobfMethodName + obfParamsDescriptor -> obfMethodName
-  ) {}
 
   static ReflectionRemapperImpl fromMappingTree(
     final MappingTree tree,
@@ -123,13 +125,77 @@ final class ReflectionRemapperImpl implements ReflectionRemapper {
       final ClassMapping map = new ClassMapping(
         cls.getName(toNamespace).replace('/', '.'),
         cls.getName(fromNamespace).replace('/', '.'),
-        Map.copyOf(fields),
-        Map.copyOf(methods)
+        Collections.unmodifiableMap(fields),
+        Collections.unmodifiableMap(methods)
       );
 
       mappings.add(map);
     }
 
     return new ReflectionRemapperImpl(mappings);
+  }
+
+  private static final class ClassMapping {
+    private final String obfName;
+    private final String deobfName;
+    private final Map<String, String> fieldsDeobfToObf;
+    private final Map<String, String> methods; // deobfMethodName + obfParamsDescriptor -> obfMethodName
+
+    private ClassMapping(
+      final String obfName,
+      final String deobfName,
+      final Map<String, String> fieldsDeobfToObf,
+      final Map<String, String> methods
+    ) {
+      this.obfName = obfName;
+      this.deobfName = deobfName;
+      this.fieldsDeobfToObf = fieldsDeobfToObf;
+      this.methods = methods;
+    }
+
+    public String obfName() {
+      return this.obfName;
+    }
+
+    public String deobfName() {
+      return this.deobfName;
+    }
+
+    public Map<String, String> fieldsDeobfToObf() {
+      return this.fieldsDeobfToObf;
+    }
+
+    public Map<String, String> methods() {
+      return this.methods;
+    }
+
+    @Override
+    public boolean equals(final @Nullable Object obj) {
+      if (obj == this) {
+        return true;
+      }
+      if (obj == null || obj.getClass() != this.getClass()) {
+        return false;
+      }
+      final @Nullable ClassMapping that = (ClassMapping) obj;
+      return Objects.equals(this.obfName, that.obfName) &&
+        Objects.equals(this.deobfName, that.deobfName) &&
+        Objects.equals(this.fieldsDeobfToObf, that.fieldsDeobfToObf) &&
+        Objects.equals(this.methods, that.methods);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(this.obfName, this.deobfName, this.fieldsDeobfToObf, this.methods);
+    }
+
+    @Override
+    public String toString() {
+      return "ClassMapping[" +
+        "obfName=" + this.obfName + ", " +
+        "deobfName=" + this.deobfName + ", " +
+        "fieldsDeobfToObf=" + this.fieldsDeobfToObf + ", " +
+        "methods=" + this.methods + ']';
+    }
   }
 }

@@ -17,6 +17,11 @@
  */
 package xyz.jpenilla.reflectionremapper.internal.util;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.function.UnaryOperator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -26,6 +31,13 @@ import xyz.jpenilla.reflectionremapper.proxy.annotation.Proxies;
 @DefaultQualifier(NonNull.class)
 public final class Util {
   private Util() {
+  }
+
+  private static final @Nullable Method PRIVATE_LOOKUP_IN = findMethod(MethodHandles.class, "privateLookupIn", Class.class, MethodHandles.Lookup.class);
+  private static final @Nullable Method DESCRIPTOR_STRING = findMethod(Class.class, "descriptorString");
+
+  public static boolean mojangMapped() {
+    return classExists("net.minecraft.server.level.ServerPlayer");
   }
 
   public static boolean classExists(final String className) {
@@ -82,5 +94,71 @@ public final class Util {
     } catch (final ClassNotFoundException ex) {
       throw new IllegalArgumentException("Could not find class for @Proxied className() " + proxies.className() + ".");
     }
+  }
+
+  private static @Nullable Method findMethod(final Class<?> holder, final String name, final Class<?>... paramTypes) {
+    try {
+      return holder.getDeclaredMethod(name, paramTypes);
+    } catch (final ReflectiveOperationException ex) {
+      return null;
+    }
+  }
+
+  public static MethodHandle handleForDefaultMethod(
+    final Class<?> interfaceClass,
+    final Object proxy,
+    final Method method
+  ) throws Throwable {
+    if (PRIVATE_LOOKUP_IN == null) { // jdk 8
+      final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
+        .getDeclaredConstructor(Class.class);
+      constructor.setAccessible(true);
+      return constructor.newInstance(interfaceClass)
+        .in(interfaceClass)
+        .unreflectSpecial(method, interfaceClass)
+        .bindTo(proxy);
+    }
+
+    // jdk 9+
+    return ((MethodHandles.Lookup) PRIVATE_LOOKUP_IN.invoke(null, proxy.getClass(), MethodHandles.lookup()))
+      .findSpecial(interfaceClass, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()), interfaceClass)
+      .bindTo(proxy);
+  }
+
+  public static String descriptorString(final Class<?> clazz) {
+    if (DESCRIPTOR_STRING != null) {
+      // jdk 12+
+      try {
+        return (String) DESCRIPTOR_STRING.invoke(clazz);
+      } catch (final ReflectiveOperationException ex) {
+        throw new RuntimeException("Failed to call Class#descriptorString", ex);
+      }
+    }
+
+    if (clazz == long.class) {
+      return "J";
+    } else if (clazz == int.class) {
+      return "I";
+    } else if (clazz == char.class) {
+      return "C";
+    } else if (clazz == short.class) {
+      return "S";
+    } else if (clazz == byte.class) {
+      return "B";
+    } else if (clazz == double.class) {
+      return "D";
+    } else if (clazz == float.class) {
+      return "F";
+    } else if (clazz == boolean.class) {
+      return "Z";
+    } else if (clazz == void.class) {
+      return "V";
+    }
+
+    if (clazz.isArray()) {
+      return "[" + descriptorString(clazz.getComponentType());
+    }
+
+    return 'L' + clazz.getName().replace('.', '/') + ';';
   }
 }

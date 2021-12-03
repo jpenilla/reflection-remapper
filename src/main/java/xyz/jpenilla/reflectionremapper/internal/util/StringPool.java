@@ -25,7 +25,15 @@ import org.checkerframework.framework.qual.DefaultQualifier;
 
 @DefaultQualifier(NonNull.class)
 public final class StringPool {
-  private final Map<String, String> pool = new HashMap<>();
+  private final Map<String, String> pool;
+
+  public StringPool(final Map<String, String> backingMap) {
+    this.pool = backingMap;
+  }
+
+  public StringPool() {
+    this(new HashMap<>());
+  }
 
   public String string(final String string) {
     return this.pool.computeIfAbsent(string, Function.identity());

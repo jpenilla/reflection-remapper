@@ -24,14 +24,15 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.DefaultQualifier;
 
-import static xyz.jpenilla.reflectionremapper.internal.util.Util.classExists;
+import static xyz.jpenilla.reflectionremapper.internal.util.Util.mojangMapped;
 
 /**
  * Interface providing methods for remapping class, method, and field names from one
@@ -99,7 +100,7 @@ public interface ReflectionRemapper {
     try {
       final MemoryMappingTree tree = new MemoryMappingTree(true);
       tree.setSrcNamespace(fromNamespace);
-      tree.setDstNamespaces(List.of(toNamespace));
+      tree.setDstNamespaces(new ArrayList<>(Collections.singletonList(toNamespace)));
 
       MappingReader.read(new InputStreamReader(mappings, StandardCharsets.UTF_8), tree);
 
@@ -189,18 +190,14 @@ public interface ReflectionRemapper {
     } catch (final ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
-    final @Nullable InputStream reobfIn = craftServerClass.getClassLoader().getResourceAsStream("META-INF/mappings/reobf.tiny");
-    if (reobfIn == null) {
-      throw new IllegalStateException("Could not find mappings in expected location.");
-    }
-    try (reobfIn) {
+
+    try (final @Nullable InputStream reobfIn = craftServerClass.getClassLoader().getResourceAsStream("META-INF/mappings/reobf.tiny")) {
+      if (reobfIn == null) {
+        throw new IllegalStateException("Could not find mappings in expected location.");
+      }
       return forPaperReobfMappings(reobfIn);
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private static boolean mojangMapped() {
-    return classExists("net.minecraft.server.level.ServerPlayer");
   }
 }
