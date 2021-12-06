@@ -124,7 +124,7 @@ public final class Util {
     }
 
     // jdk 9+
-    return ((MethodHandles.Lookup) PRIVATE_LOOKUP_IN.invoke(null, proxy.getClass(), MethodHandles.lookup()))
+    return ((MethodHandles.Lookup) PRIVATE_LOOKUP_IN.invoke(null, interfaceClass, MethodHandles.lookup()))
       .findSpecial(interfaceClass, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()), interfaceClass)
       .bindTo(proxy);
   }
