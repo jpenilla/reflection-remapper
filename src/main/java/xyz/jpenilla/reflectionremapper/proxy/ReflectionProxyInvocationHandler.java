@@ -133,7 +133,7 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
     final BiFunction<String, Class<?>[], String> methodMapper
   ) {
     for (final Method method : this.interfaceClass.getDeclaredMethods()) {
-      if (isEqualsMethod(method) || isHashCodeMethod(method) || isToStringMethod(method)) {
+      if (isEqualsMethod(method) || isHashCodeMethod(method) || isToStringMethod(method) || Util.isSynthetic(method.getModifiers())) {
         continue;
       } else if (method.isDefault()) {
         // We just load default methods lazily, no mappings need to be resolved so there is no need to eagerly evaluate them before mappings are discarded.
@@ -189,9 +189,6 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
         throw new IllegalArgumentException("Non-static method invokers should have at least one parameter. Method " + method.getName() + " in " + this.interfaceClass.getTypeName() + " has " + method.getParameterCount());
       }
 
-      if (Util.isSynthetic(method.getModifiers())) {
-        continue;
-      }
       this.methodHandles.put(
         method,
         Util.sneakyThrows(() -> LOOKUP.unreflect(this.findProxiedMethod(method, classMapper, methodMapper)))
