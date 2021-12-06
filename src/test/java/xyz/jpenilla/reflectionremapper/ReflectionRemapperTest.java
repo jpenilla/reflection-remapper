@@ -17,6 +17,8 @@
  */
 package xyz.jpenilla.reflectionremapper;
 
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Test;
 import xyz.jpenilla.reflectionremapper.proxy.ReflectionProxyFactory;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.ConstructorInvoker;
@@ -82,6 +84,12 @@ class ReflectionRemapperTest {
     assertEquals(expected, instance.secret());
   }
 
+  @Test
+  void testSynthetics() {
+    final PrivateClassProxy proxy = this.factory().reflectionProxy(PrivateClassProxy.class);
+    assertEquals("nothing5", proxy.get(() -> "nothing", 5).get());
+  }
+
   @Proxies(className = "xyz.jpenilla.reflectionremapper.ReflectionRemapperTest$PrivateClass")
   interface PrivateClassProxy {
     String secret(Object instance);
@@ -119,6 +127,10 @@ class ReflectionRemapperTest {
 
     @ConstructorInvoker
     Object construct(String secret);
+
+    default Supplier<String> get(final Supplier<String> s, final int number) {
+      return () -> s.get() + number; // will create a synthetic method
+    }
   }
 
   private static final class PrivateClass {

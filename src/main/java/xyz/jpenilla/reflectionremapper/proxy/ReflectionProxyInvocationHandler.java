@@ -189,6 +189,9 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
         throw new IllegalArgumentException("Non-static method invokers should have at least one parameter. Method " + method.getName() + " in " + this.interfaceClass.getTypeName() + " has " + method.getParameterCount());
       }
 
+      if (Util.isSynthetic(method.getModifiers())) {
+        continue;
+      }
       this.methodHandles.put(
         method,
         Util.sneakyThrows(() -> LOOKUP.unreflect(this.findProxiedMethod(method, classMapper, methodMapper)))

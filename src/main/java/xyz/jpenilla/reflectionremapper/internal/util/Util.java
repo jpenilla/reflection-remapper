@@ -68,6 +68,10 @@ public final class Util {
     T get() throws Throwable;
   }
 
+  public static boolean isSynthetic(final int modifiers) {
+    return (modifiers & 0x1000 /* Opcodes.ACC_SYNTHETIC */) != 0;
+  }
+
   public static Class<?> findProxiedClass(
     final Class<?> proxyInterface,
     final UnaryOperator<String> classMapper
