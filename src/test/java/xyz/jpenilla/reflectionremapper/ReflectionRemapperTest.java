@@ -18,7 +18,6 @@
 package xyz.jpenilla.reflectionremapper;
 
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Test;
 import xyz.jpenilla.reflectionremapper.proxy.ReflectionProxyFactory;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.ConstructorInvoker;
