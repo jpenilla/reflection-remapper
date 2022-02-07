@@ -4,6 +4,7 @@ plugins {
 
 group = "xyz.jpenilla"
 version = "0.1.0-SNAPSHOT"
+description = "reflection-remapper is a library to simplify making reflective calls, with specific support for remapped environments."
 
 repositories {
   maven("https://maven.fabricmc.net/")

@@ -7,7 +7,7 @@ There are currently no release builds.
 > <details open>
 > <summary>Using snapshot builds</summary>
 >
-> Snapshot builds are available on the [`https://repo.jpenilla.xyz/snapshots/`](https://repo.jpenilla.xyz/snapshots/) maven repository.
+> Snapshot builds are available on the Sonatype snapshots maven repository: `https://s01.oss.sonatype.org/content/repositories/snapshots/`
 >
 > Consult your build tool's documentation for details on adding maven repositories to your project.
 > </details>
