@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -46,7 +47,8 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
   private static final Object[] EMPTY_OBJECT_ARRAY = new Object[]{};
   private final Class<I> interfaceClass;
   private final Class<?> proxiedClass;
-  private final Map<Method, MethodHandle> methodHandles = new ConcurrentHashMap<>();
+  private final Map<Method, MethodHandle> methodHandles = new HashMap<>();
+  private final Map<Method, MethodHandle> defaultMethodHandles = new ConcurrentHashMap<>();
 
   ReflectionProxyInvocationHandler(
     final Class<I> interfaceClass,
@@ -113,11 +115,9 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
     final Method method,
     final Object[] args
   ) throws Throwable {
-    final MethodHandle handle = this.methodHandles.computeIfAbsent(
+    final MethodHandle handle = this.defaultMethodHandles.computeIfAbsent(
       method,
-      m -> Util.sneakyThrows(
-        () -> handleForDefaultMethod(this.interfaceClass, proxy, method)
-      )
+      m -> Util.sneakyThrows(() -> handleForDefaultMethod(this.interfaceClass, proxy, m))
     );
 
     if (args.length == 0) {
