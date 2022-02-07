@@ -1,7 +1,6 @@
 plugins {
   id("base-conventions")
   id("net.kyori.indra.publishing")
-  id("net.kyori.indra.publishing.sonatype")
 }
 
 indra {
@@ -18,10 +17,6 @@ indra {
       }
     }
   }
-}
-
-indraSonatype {
-  useAlternateSonatypeOSSHost("s01")
 }
 
 signing {

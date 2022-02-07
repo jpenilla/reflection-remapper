@@ -1,6 +1,7 @@
 plugins {
   id("base-conventions")
   id("publishing-conventions")
+  id("net.kyori.indra.publishing.sonatype")
 }
 
 val devBundle: Configuration by configurations.creating
@@ -27,4 +28,8 @@ tasks {
     }
     dependsOn(extractMappings)
   }
+}
+
+indraSonatype {
+  useAlternateSonatypeOSSHost("s01")
 }
