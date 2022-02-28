@@ -20,8 +20,7 @@ indra {
 }
 
 signing {
-  useInMemoryPgpKeys(
-    providers.gradleProperty("signingKey").forUseAtConfigurationTime().orNull,
-    providers.gradleProperty("signingPassword").forUseAtConfigurationTime().orNull
-  )
+  val signingKey: String? by project
+  val signingPassword: String? by project
+  useInMemoryPgpKeys(signingKey, signingPassword)
 }
