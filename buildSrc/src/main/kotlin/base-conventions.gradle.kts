@@ -42,7 +42,7 @@ repositories {
 }
 
 dependencies {
-  compileOnlyApi("org.checkerframework", "checker-qual", "3.21.2")
+  compileOnlyApi("org.checkerframework", "checker-qual", "3.21.3")
 
   testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.2")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
