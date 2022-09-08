@@ -23,6 +23,8 @@ tasks {
     if (!name.contains("Java8")) {
       inputs.files(memoryMeasurer)
       doFirst {
+        jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
+        jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
         jvmArgs("-javaagent:${memoryMeasurer.asFileTree.singleFile.path}")
       }
     }

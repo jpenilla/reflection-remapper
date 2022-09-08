@@ -13,11 +13,11 @@ indra {
 }
 
 dependencies {
-  paperDevBundle("1.18.2-R0.1-SNAPSHOT")
+  paperDevBundle("1.19.2-R0.1-SNAPSHOT")
 
   implementation(projects.reflectionRemapper)
 
-  implementation(platform("cloud.commandframework:cloud-bom:1.6.2"))
+  implementation(platform("cloud.commandframework:cloud-bom:1.7.1"))
   implementation("cloud.commandframework", "cloud-paper")
   implementation("cloud.commandframework", "cloud-minecraft-extras") {
     isTransitive = false // Paper provides adventure
@@ -39,6 +39,6 @@ tasks {
 bukkit {
   name = "ReflectionRemapperTest"
   main = "xyz.jpenilla.reflectionremapper.testplugin.TestPlugin"
-  apiVersion = "1.18"
+  apiVersion = "1.19"
   authors = listOf("jmp")
 }

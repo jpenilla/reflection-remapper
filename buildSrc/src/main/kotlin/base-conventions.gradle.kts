@@ -15,6 +15,7 @@ indra {
   javaVersions {
     minimumToolchain(17)
     target(8)
+    testWith(8, 17)
   }
 }
 
@@ -42,8 +43,8 @@ repositories {
 }
 
 dependencies {
-  compileOnlyApi("org.checkerframework", "checker-qual", "3.21.3")
+  compileOnlyApi("org.checkerframework", "checker-qual", "3.24.0")
 
-  testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.2")
+  testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.0")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
 }
