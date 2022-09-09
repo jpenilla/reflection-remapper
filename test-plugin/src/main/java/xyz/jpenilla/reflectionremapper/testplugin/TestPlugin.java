@@ -19,6 +19,7 @@ package xyz.jpenilla.reflectionremapper.testplugin;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.AudienceProvider;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
@@ -51,23 +52,24 @@ public final class TestPlugin extends JavaPlugin {
   private void registerCommands(final PaperCommandManager<CommandSender> manager) {
     final Command.Builder<CommandSender> createEndPlatform = manager.commandBuilder("create_end_platform")
       .senderType(Player.class)
-      .handler(ctx -> {
-        final ServerPlayer serverPlayer = ((CraftPlayer) ctx.getSender()).getHandle();
-        Reflection.SERVER_PLAYER.createEndPlatform(serverPlayer, serverPlayer.getLevel(), new BlockPos(serverPlayer.getBlockX(), serverPlayer.getBlockY(), serverPlayer.getBlockZ()));
-      });
+      .handler(this::executeCreateEndPlatform);
     manager.command(createEndPlatform);
 
     final Command.Builder<CommandSender> strikeLightning = manager.commandBuilder("strike_lightning")
       .senderType(Player.class)
-      .handler(ctx -> {
-        final ServerPlayer serverPlayer = ((CraftPlayer) ctx.getSender()).getHandle();
-        final BlockPos lightningTarget = Reflection.SERVER_LEVEL.findLightningTargetAround(
-          serverPlayer.getLevel(),
-          new BlockPos(serverPlayer.getBlockX(), serverPlayer.getBlockY(), serverPlayer.getBlockZ())
-        );
-        ((Player) ctx.getSender()).getWorld().strikeLightning(MCUtil.toLocation(serverPlayer.getLevel(), lightningTarget));
-      });
+      .handler(this::executeStrikeLightning);
     manager.command(strikeLightning);
+  }
+
+  private void executeCreateEndPlatform(final CommandContext<CommandSender> ctx) {
+    final ServerPlayer serverPlayer = ((CraftPlayer) ctx.getSender()).getHandle();
+    Reflection.SERVER_PLAYER.createEndPlatform(serverPlayer, serverPlayer.getLevel(), serverPlayer.blockPosition());
+  }
+
+  private void executeStrikeLightning(final CommandContext<CommandSender> ctx) {
+    final ServerPlayer serverPlayer = ((CraftPlayer) ctx.getSender()).getHandle();
+    final BlockPos lightningTarget = Reflection.SERVER_LEVEL.findLightningTargetAround(serverPlayer.getLevel(), serverPlayer.blockPosition());
+    ((Player) ctx.getSender()).getWorld().strikeLightning(MCUtil.toLocation(serverPlayer.getLevel(), lightningTarget));
   }
 
   public static final class Reflection {
