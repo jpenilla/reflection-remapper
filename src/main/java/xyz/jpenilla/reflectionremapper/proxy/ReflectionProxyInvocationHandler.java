@@ -181,7 +181,7 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
       final boolean hasStaticAnnotation = method.getDeclaredAnnotation(Static.class) != null;
 
       if (getterAnnotation != null) {
-        final MethodHandle handle = Util.sneakyThrows(() -> LOOKUP.unreflectGetter(getDeclaredFieldAndSetAccessible(this.proxiedClass, getterAnnotation.value(), fieldMapper)));
+        final MethodHandle handle = Util.sneakyThrows(() -> LOOKUP.unreflectGetter(this.findProxiedField(getterAnnotation.value(), fieldMapper)));
         if (hasStaticAnnotation) {
           checkParameterCount(method, this.interfaceClass, 0, "Static @FieldGetters should have no parameters.");
           this.staticGetters.put(method, handle.asType(MethodType.methodType(Object.class)));
@@ -193,7 +193,7 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
       }
 
       if (setterAnnotation != null) {
-        final MethodHandle handle = Util.sneakyThrows(() -> LOOKUP.unreflectSetter(getDeclaredFieldAndSetAccessible(this.proxiedClass, setterAnnotation.value(), fieldMapper)));
+        final MethodHandle handle = Util.sneakyThrows(() -> LOOKUP.unreflectSetter(this.findProxiedField(setterAnnotation.value(), fieldMapper)));
         if (hasStaticAnnotation) {
           checkParameterCount(method, this.interfaceClass, 1, "Static @FieldSetters should have one parameter.");
           this.staticSetters.put(method, handle.asType(MethodType.methodType(Object.class, Object.class)));
@@ -249,22 +249,20 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
       && method.getReturnType() == boolean.class;
   }
 
-  @SuppressWarnings("checkstyle:MethodName")
-  private static Field getDeclaredFieldAndSetAccessible(
-    final Class<?> holder,
+  private Field findProxiedField(
     final String fieldName,
     final UnaryOperator<String> fieldMapper
   ) {
     final Field field;
     try {
-      field = holder.getDeclaredField(fieldMapper.apply(fieldName));
+      field = this.proxiedClass.getDeclaredField(fieldMapper.apply(fieldName));
     } catch (final NoSuchFieldException e) {
-      throw new IllegalArgumentException("Could not find field '" + fieldName + "' in " + holder.getTypeName(), e);
+      throw new IllegalArgumentException("Could not find field '" + fieldName + "' in " + this.proxiedClass.getTypeName(), e);
     }
     try {
       field.setAccessible(true);
     } catch (final Exception ex) {
-      throw new IllegalStateException("Could not set access for field '" + fieldName + "' in " + holder.getTypeName(), ex);
+      throw new IllegalStateException("Could not set access for field '" + fieldName + "' in " + this.proxiedClass.getTypeName(), ex);
     }
     return field;
   }
