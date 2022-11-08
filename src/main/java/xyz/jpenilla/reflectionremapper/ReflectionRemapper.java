@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -71,6 +72,41 @@ public interface ReflectionRemapper {
    * @return runtime method name
    */
   String remapMethodName(Class<?> holdingClass, String methodName, Class<?>... paramTypes);
+
+  /**
+   * Remaps a Mojang-mapped class or array name (as given to Class.forName(String)) to
+   * its current runtime name using {@link #remapClassName(String)}.
+   *
+   * @param name class or array name
+   * @return remapped name
+   */
+  default String remapClassOrArrayName(final String name) {
+    Objects.requireNonNull(name, "name");
+    if (name.isEmpty()) {
+      return name;
+    }
+
+    // Array type
+    if (name.charAt(0) == '[') {
+      final int last = name.lastIndexOf('[');
+
+      try {
+        // Object array type
+        if (name.charAt(last + 1) == 'L') {
+          final String cls = name.substring(last + 2, name.length() - 1);
+          return name.substring(0, last + 2) + this.remapClassName(cls) + ';';
+        }
+      } catch (final IndexOutOfBoundsException ex) {
+        // Pass through on invalid names
+        return name;
+      }
+
+      // Primitive array
+      return name;
+    }
+
+    return this.remapClassName(name);
+  }
 
   /**
    * Returns a noop {@link ReflectionRemapper} instance which simply passes through the given
