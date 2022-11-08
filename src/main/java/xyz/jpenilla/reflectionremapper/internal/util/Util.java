@@ -50,7 +50,7 @@ public final class Util {
   }
 
   @SuppressWarnings("unchecked")
-  public static <E extends Throwable> void sneakyThrow(final Throwable ex) throws E {
+  public static <E extends Throwable> E sneakyThrow(final Throwable ex) throws E {
     throw (E) ex;
   }
 
@@ -58,8 +58,7 @@ public final class Util {
     try {
       return supplier.get();
     } catch (final Throwable ex) {
-      sneakyThrow(ex);
-      return null; // unreachable
+      throw sneakyThrow(ex);
     }
   }
 
@@ -110,7 +109,6 @@ public final class Util {
 
   public static MethodHandle handleForDefaultMethod(
     final Class<?> interfaceClass,
-    final Object proxy,
     final Method method
   ) throws Throwable {
     if (PRIVATE_LOOKUP_IN == null) { // jdk 8
@@ -119,14 +117,17 @@ public final class Util {
       constructor.setAccessible(true);
       return constructor.newInstance(interfaceClass)
         .in(interfaceClass)
-        .unreflectSpecial(method, interfaceClass)
-        .bindTo(proxy);
+        .unreflectSpecial(method, interfaceClass);
     }
 
     // jdk 9+
     return ((MethodHandles.Lookup) PRIVATE_LOOKUP_IN.invoke(null, interfaceClass, MethodHandles.lookup()))
-      .findSpecial(interfaceClass, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()), interfaceClass)
-      .bindTo(proxy);
+      .findSpecial(
+        interfaceClass,
+        method.getName(),
+        MethodType.methodType(method.getReturnType(), method.getParameterTypes()),
+        interfaceClass
+      );
   }
 
   public static String descriptorString(final Class<?> clazz) {

@@ -19,6 +19,7 @@ package xyz.jpenilla.reflectionremapper.proxy;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -47,8 +48,12 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
   private static final Object[] EMPTY_OBJECT_ARRAY = new Object[]{};
   private final Class<I> interfaceClass;
   private final Class<?> proxiedClass;
-  private final Map<Method, MethodHandle> methodHandles = new HashMap<>();
-  private final Map<Method, MethodHandle> defaultMethodHandles = new ConcurrentHashMap<>();
+  private final Map<Method, MethodHandle> methods = new HashMap<>();
+  private final Map<Method, MethodHandle> getters = new HashMap<>();
+  private final Map<Method, MethodHandle> setters = new HashMap<>();
+  private final Map<Method, MethodHandle> staticGetters = new HashMap<>();
+  private final Map<Method, MethodHandle> staticSetters = new HashMap<>();
+  private final Map<Method, MethodHandle> defaultMethods = new ConcurrentHashMap<>(); // CHM as it's lazily populated
 
   ReflectionProxyInvocationHandler(
     final Class<I> interfaceClass,
@@ -57,11 +62,7 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
   ) {
     this.interfaceClass = interfaceClass;
     this.proxiedClass = proxiedClass;
-    this.scanInterface(
-      reflectionRemapper::remapClassName,
-      fieldName -> reflectionRemapper.remapFieldName(this.proxiedClass, fieldName),
-      (methodName, parameters) -> reflectionRemapper.remapMethodName(this.proxiedClass, methodName, parameters)
-    );
+    this.scanInterface(reflectionRemapper);
   }
 
   @Override
@@ -86,28 +87,41 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
       return this.handleDefaultMethod(proxy, method, args);
     }
 
-    final boolean hasStaticAnnotation = method.getDeclaredAnnotation(Static.class) != null;
-
-    final @Nullable FieldGetter getterAnnotation = method.getDeclaredAnnotation(FieldGetter.class);
-    if (getterAnnotation != null) {
-      if (hasStaticAnnotation) {
-        return this.methodHandles.get(method).invoke();
+    // Method or constructor
+    final @Nullable MethodHandle methodHandle = this.methods.get(method);
+    if (methodHandle != null) {
+      if (args.length == 0) {
+        return methodHandle.invokeExact();
       }
-      return this.methodHandles.get(method).bindTo(args[0]).invoke();
+      return methodHandle.invokeExact(args);
     }
 
-    final @Nullable FieldSetter setterAnnotation = method.getDeclaredAnnotation(FieldSetter.class);
-    if (setterAnnotation != null) {
-      if (hasStaticAnnotation) {
-        return this.methodHandles.get(method).invokeWithArguments(args[0]);
-      }
-      return this.methodHandles.get(method).bindTo(args[0]).invokeWithArguments(args[1]);
+    // Getter
+    final @Nullable MethodHandle getter = this.getters.get(method);
+    if (getter != null) {
+      return getter.invokeExact(args[0]);
     }
 
-    if (hasStaticAnnotation) {
-      return this.methodHandles.get(method).invokeWithArguments(args);
+    // Setter
+    final @Nullable MethodHandle setter = this.setters.get(method);
+    if (setter != null) {
+      return setter.invokeExact(args[0], args[1]);
     }
-    return this.methodHandles.get(method).bindTo(args[0]).invokeWithArguments(Arrays.stream(args).skip(1).toArray());
+
+    // Static getter
+    final @Nullable MethodHandle staticGetter = this.staticGetters.get(method);
+    if (staticGetter != null) {
+      return staticGetter.invokeExact();
+    }
+
+    // Static setter
+    final @Nullable MethodHandle staticSetter = this.staticSetters.get(method);
+    if (staticSetter != null) {
+      return staticSetter.invokeExact(args[0]);
+    }
+
+    // ?
+    throw new IllegalStateException();
   }
 
   private @Nullable Object handleDefaultMethod(
@@ -115,16 +129,24 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
     final Method method,
     final Object[] args
   ) throws Throwable {
-    final MethodHandle handle = this.defaultMethodHandles.computeIfAbsent(
+    final MethodHandle handle = this.defaultMethods.computeIfAbsent(
       method,
-      m -> Util.sneakyThrows(() -> handleForDefaultMethod(this.interfaceClass, proxy, m))
+      m -> adapt(Util.sneakyThrows(() -> handleForDefaultMethod(this.interfaceClass, m)).bindTo(proxy))
     );
 
     if (args.length == 0) {
       return handle.invokeExact();
     } else {
-      return handle.invokeWithArguments(args);
+      return handle.invokeExact(args);
     }
+  }
+
+  private void scanInterface(final ReflectionRemapper reflectionRemapper) {
+    this.scanInterface(
+      reflectionRemapper::remapClassName,
+      fieldName -> reflectionRemapper.remapFieldName(this.proxiedClass, fieldName),
+      (methodName, parameters) -> reflectionRemapper.remapMethodName(this.proxiedClass, methodName, parameters)
+    );
   }
 
   private void scanInterface(
@@ -137,14 +159,15 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
         continue;
       } else if (method.isDefault()) {
         // We just load default methods lazily, no mappings need to be resolved so there is no need to eagerly evaluate them before mappings are discarded.
+        // Additionally, we can cache the bound handle.
         continue;
       }
 
       final boolean constructorInvoker = method.getDeclaredAnnotation(ConstructorInvoker.class) != null;
       if (constructorInvoker) {
-        this.methodHandles.put(
+        this.methods.put(
           method,
-          Util.sneakyThrows(() -> LOOKUP.unreflectConstructor(this.findProxiedConstructor(method, classMapper)))
+          adapt(Util.sneakyThrows(() -> LOOKUP.unreflectConstructor(this.findProxiedConstructor(method, classMapper))))
         );
         continue;
       }
@@ -158,30 +181,26 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
       final boolean hasStaticAnnotation = method.getDeclaredAnnotation(Static.class) != null;
 
       if (getterAnnotation != null) {
+        final MethodHandle handle = Util.sneakyThrows(() -> LOOKUP.unreflectGetter(getDeclaredFieldAndSetAccessible(this.proxiedClass, getterAnnotation.value(), fieldMapper)));
         if (hasStaticAnnotation) {
           checkParameterCount(method, this.interfaceClass, 0, "Static @FieldGetters should have no parameters.");
+          this.staticGetters.put(method, handle.asType(MethodType.methodType(Object.class)));
         } else {
           checkParameterCount(method, this.interfaceClass, 1, "Non-static @FieldGetters should have one parameter.");
+          this.getters.put(method, handle.asType(MethodType.methodType(Object.class, Object.class)));
         }
-
-        this.methodHandles.put(
-          method,
-          Util.sneakyThrows(() -> LOOKUP.unreflectGetter(getDeclaredFieldAndSetAccessible(this.proxiedClass, getterAnnotation.value(), fieldMapper)))
-        );
         continue;
       }
 
       if (setterAnnotation != null) {
+        final MethodHandle handle = Util.sneakyThrows(() -> LOOKUP.unreflectSetter(getDeclaredFieldAndSetAccessible(this.proxiedClass, setterAnnotation.value(), fieldMapper)));
         if (hasStaticAnnotation) {
           checkParameterCount(method, this.interfaceClass, 1, "Static @FieldSetters should have one parameter.");
+          this.staticSetters.put(method, handle.asType(MethodType.methodType(Object.class, Object.class)));
         } else {
           checkParameterCount(method, this.interfaceClass, 2, "Non-static @FieldSetters should have two parameters.");
+          this.setters.put(method, handle.asType(MethodType.methodType(Object.class, Object.class, Object.class)));
         }
-
-        this.methodHandles.put(
-          method,
-          Util.sneakyThrows(() -> LOOKUP.unreflectSetter(getDeclaredFieldAndSetAccessible(this.proxiedClass, setterAnnotation.value(), fieldMapper)))
-        );
         continue;
       }
 
@@ -189,11 +208,19 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
         throw new IllegalArgumentException("Non-static method invokers should have at least one parameter. Method " + method.getName() + " in " + this.interfaceClass.getTypeName() + " has " + method.getParameterCount());
       }
 
-      this.methodHandles.put(
+      this.methods.put(
         method,
-        Util.sneakyThrows(() -> LOOKUP.unreflect(this.findProxiedMethod(method, classMapper, methodMapper)))
+        adapt(Util.sneakyThrows(() -> LOOKUP.unreflect(this.findProxiedMethod(method, classMapper, methodMapper))))
       );
     }
+  }
+
+  private static MethodHandle adapt(final MethodHandle handle) {
+    if (handle.type().parameterCount() == 0) {
+      return handle.asType(MethodType.methodType(Object.class));
+    }
+    return handle.asSpreader(Object[].class, handle.type().parameterCount())
+      .asType(MethodType.methodType(Object.class, Object[].class));
   }
 
   private static void checkParameterCount(final Method method, final Class<?> holder, final int expected, final String message) {
