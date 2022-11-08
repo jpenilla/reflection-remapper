@@ -8,7 +8,7 @@ description = "reflection-remapper is a library to simplify making reflective ca
 
 repositories {
   maven("https://maven.fabricmc.net/")
-  maven("https://papermc.io/repo/repository/maven-public/")
+  maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
