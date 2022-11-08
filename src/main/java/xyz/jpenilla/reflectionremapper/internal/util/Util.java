@@ -1,7 +1,7 @@
 /*
  * reflection-remapper
  *
- * Copyright (c) 2021 Jason Penilla
+ * Copyright (c) 2021-2022 Jason Penilla
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
