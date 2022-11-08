@@ -41,4 +41,9 @@ final class NoopReflectionRemapper implements ReflectionRemapper {
   public String remapMethodName(final Class<?> holdingClass, final String methodName, final Class<?>... paramTypes) {
     return methodName;
   }
+
+  @Override
+  public String remapClassOrArrayName(final String name) {
+    return name;
+  }
 }
