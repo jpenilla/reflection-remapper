@@ -143,7 +143,7 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
 
   private void scanInterface(final ReflectionRemapper reflectionRemapper) {
     this.scanInterface(
-      reflectionRemapper::remapClassName,
+      reflectionRemapper::remapClassOrArrayName,
       fieldName -> reflectionRemapper.remapFieldName(this.proxiedClass, fieldName),
       (methodName, parameters) -> reflectionRemapper.remapMethodName(this.proxiedClass, methodName, parameters)
     );
