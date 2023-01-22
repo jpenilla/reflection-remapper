@@ -1,8 +1,8 @@
 plugins {
   `base-conventions`
   id("io.papermc.paperweight.userdev")
-  id("xyz.jpenilla.run-paper") version "1.1.0"
-  id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
+  id("xyz.jpenilla.run-paper") version "2.0.1"
+  id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
   id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -13,11 +13,11 @@ indra {
 }
 
 dependencies {
-  paperDevBundle("1.19.2-R0.1-SNAPSHOT")
+  paperDevBundle("1.19.3-R0.1-SNAPSHOT")
 
   implementation(projects.reflectionRemapper)
 
-  implementation(platform("cloud.commandframework:cloud-bom:1.7.1"))
+  implementation(platform("cloud.commandframework:cloud-bom:1.8.0"))
   implementation("cloud.commandframework", "cloud-paper")
   implementation("cloud.commandframework", "cloud-minecraft-extras") {
     isTransitive = false // Paper provides adventure
