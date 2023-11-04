@@ -1,0 +1,7 @@
+name: ReflectionRemapperTest
+version: $version
+main: xyz.jpenilla.reflectionremapper.testplugin.TestPlugin
+description: $desc
+authors:
+ - jmp
+api-version: 1.20

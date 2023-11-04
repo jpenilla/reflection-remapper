@@ -2,7 +2,7 @@ plugins {
   `java-library`
   id("net.kyori.indra")
   id("net.kyori.indra.checkstyle")
-  id("net.kyori.indra.license-header")
+  id("net.kyori.indra.licenser.spotless")
 }
 
 if (project != rootProject) {
@@ -19,8 +19,8 @@ indra {
   }
 }
 
-license {
-  header.set(resources.text.fromFile(rootProject.file("LICENSE_HEADER")))
+indraSpotlessLicenser {
+  licenseHeaderFile(rootProject.file("LICENSE_HEADER"))
 }
 
 tasks {
@@ -43,8 +43,8 @@ repositories {
 }
 
 dependencies {
-  compileOnlyApi("org.checkerframework", "checker-qual", "3.24.0")
+  compileOnlyApi("org.checkerframework", "checker-qual", "3.40.0")
 
-  testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.0")
+  testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.10.0")
   testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
 }

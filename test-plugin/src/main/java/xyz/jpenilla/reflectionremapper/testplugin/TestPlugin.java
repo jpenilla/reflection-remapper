@@ -29,7 +29,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -63,13 +63,13 @@ public final class TestPlugin extends JavaPlugin {
 
   private void executeCreateEndPlatform(final CommandContext<CommandSender> ctx) {
     final ServerPlayer serverPlayer = ((CraftPlayer) ctx.getSender()).getHandle();
-    Reflection.SERVER_PLAYER.createEndPlatform(serverPlayer, serverPlayer.getLevel(), serverPlayer.blockPosition());
+    Reflection.SERVER_PLAYER.createEndPlatform(serverPlayer, (ServerLevel) serverPlayer.level(), serverPlayer.blockPosition());
   }
 
   private void executeStrikeLightning(final CommandContext<CommandSender> ctx) {
     final ServerPlayer serverPlayer = ((CraftPlayer) ctx.getSender()).getHandle();
-    final BlockPos lightningTarget = Reflection.SERVER_LEVEL.findLightningTargetAround(serverPlayer.getLevel(), serverPlayer.blockPosition());
-    ((Player) ctx.getSender()).getWorld().strikeLightning(MCUtil.toLocation(serverPlayer.getLevel(), lightningTarget));
+    final BlockPos lightningTarget = Reflection.SERVER_LEVEL.findLightningTargetAround((ServerLevel) serverPlayer.level(), serverPlayer.blockPosition());
+    ((Player) ctx.getSender()).getWorld().strikeLightning(MCUtil.toLocation(serverPlayer.level(), lightningTarget));
   }
 
   public static final class Reflection {

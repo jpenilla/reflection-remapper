@@ -17,5 +17,5 @@ dependencies {
 
   // testing dependencies
   testImplementation(memoryMeasurer("com.volkhart.memory", "measurer", "0.2-SNAPSHOT"))
-  devBundle("io.papermc.paper:dev-bundle:1.19.4-R0.1-SNAPSHOT")
+  devBundle("io.papermc.paper:dev-bundle:1.20.2-R0.1-SNAPSHOT")
 }
