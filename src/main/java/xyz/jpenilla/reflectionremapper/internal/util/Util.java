@@ -22,6 +22,12 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -128,6 +134,25 @@ public final class Util {
         MethodType.methodType(method.getReturnType(), method.getParameterTypes()),
         interfaceClass
       );
+  }
+
+  public static List<Class<?>> topDownInterfaceHierarchy(final Class<?> cls) {
+    if (!cls.isInterface()) {
+      throw new IllegalStateException("Expected an interface, got " + cls);
+    }
+    final Set<Class<?>> set = new LinkedHashSet<>();
+    set.add(cls);
+    interfaces(cls, set);
+    final List<Class<?>> list = new ArrayList<>(set);
+    Collections.reverse(list);
+    return Collections.unmodifiableList(list);
+  }
+
+  private static void interfaces(final Class<?> cls, final Collection<Class<?>> list) {
+    for (final Class<?> iface : cls.getInterfaces()) {
+      list.add(iface);
+      interfaces(iface, list);
+    }
   }
 
   public static String descriptorString(final Class<?> clazz) {

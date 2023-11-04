@@ -28,6 +28,8 @@ import io.papermc.paper.util.MCUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.redstone.NeighborUpdater;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -37,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.DefaultQualifier;
 import xyz.jpenilla.reflectionremapper.ReflectionRemapper;
 import xyz.jpenilla.reflectionremapper.proxy.ReflectionProxyFactory;
+import xyz.jpenilla.reflectionremapper.proxy.annotation.FieldGetter;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.Proxies;
 
 @DefaultQualifier(NonNull.class)
@@ -68,12 +71,23 @@ public final class TestPlugin extends JavaPlugin {
 
   private void executeStrikeLightning(final CommandContext<CommandSender> ctx) {
     final ServerPlayer serverPlayer = ((CraftPlayer) ctx.getSender()).getHandle();
+
+    System.out.println(Reflection.SERVER_LEVEL.neighborUpdater(serverPlayer.level()));
+    System.out.println(Reflection.LEVEL.neighborUpdater(serverPlayer.level()));
+
+    Reflection.SERVER_LEVEL.test1();
+    Reflection.SERVER_LEVEL.test2();
+    Reflection.LEVEL.test1();
+    Reflection.SERVER_LEVEL.test0();
+    Reflection.LEVEL.test0();
+
     final BlockPos lightningTarget = Reflection.SERVER_LEVEL.findLightningTargetAround((ServerLevel) serverPlayer.level(), serverPlayer.blockPosition());
     ((Player) ctx.getSender()).getWorld().strikeLightning(MCUtil.toLocation(serverPlayer.level(), lightningTarget));
   }
 
   public static final class Reflection {
     public static final ServerLevelProxy SERVER_LEVEL;
+    public static final LevelProxy LEVEL;
     public static final ServerPlayerProxy SERVER_PLAYER;
 
     static {
@@ -84,13 +98,38 @@ public final class TestPlugin extends JavaPlugin {
 
       // proxy instances are safe to hold onto
       SERVER_LEVEL = reflectionProxyFactory.reflectionProxy(ServerLevelProxy.class);
+      LEVEL = reflectionProxyFactory.reflectionProxy(LevelProxy.class);
       SERVER_PLAYER = reflectionProxyFactory.reflectionProxy(ServerPlayerProxy.class);
     }
   }
 
+  @Proxies(Level.class)
+  private interface LevelProxy {
+    @FieldGetter("neighborUpdater")
+    NeighborUpdater neighborUpdater(Level instance);
+
+    default void test0() {
+      System.out.println("LP 0");
+    }
+
+    default void test1() {
+      System.out.println("LP 1");
+    }
+  }
+
   @Proxies(ServerLevel.class)
-  private interface ServerLevelProxy {
+  private interface ServerLevelProxy extends LevelProxy {
     BlockPos findLightningTargetAround(ServerLevel instance, BlockPos pos);
+
+    @Override
+    default void test1() {
+      LevelProxy.super.test1();
+      System.out.println("SLP 1");
+    }
+
+    default void test2() {
+      System.out.println("SLP 2");
+    }
   }
 
   @Proxies(ServerPlayer.class)
