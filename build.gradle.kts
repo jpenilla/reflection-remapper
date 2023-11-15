@@ -11,11 +11,15 @@ repositories {
 }
 
 dependencies {
-  implementation("net.fabricmc", "mapping-io", "0.4.2") {
+  compileOnlyApi(libs.checker.qual)
+  implementation(libs.mapping.io) {
     exclude("org.ow2.asm")
   }
 
   // testing dependencies
-  testImplementation(memoryMeasurer("com.volkhart.memory", "measurer", "0.2-SNAPSHOT"))
-  devBundle("io.papermc.paper:dev-bundle:1.20.2-R0.1-SNAPSHOT")
+  testImplementation(libs.memoryMeasurer)
+  memoryMeasurer(libs.memoryMeasurer)
+  devBundle(libs.mappingsTestDevBundle)
+  testImplementation(libs.junit.jupiter.api)
+  testRuntimeOnly(libs.junit.jupiter.engine)
 }

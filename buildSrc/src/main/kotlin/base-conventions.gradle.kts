@@ -41,10 +41,3 @@ tasks {
 repositories {
   mavenCentral()
 }
-
-dependencies {
-  compileOnlyApi("org.checkerframework", "checker-qual", "3.40.0")
-
-  testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.10.0")
-  testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
-}

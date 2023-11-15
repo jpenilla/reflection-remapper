@@ -1,8 +1,8 @@
 plugins {
   `base-conventions`
   id("io.papermc.paperweight.userdev")
-  id("xyz.jpenilla.run-paper") version "2.2.0"
-  id("com.github.johnrengelman.shadow") version "8.1.1"
+  alias(libs.plugins.run.paper)
+  alias(libs.plugins.shadow)
 }
 
 indra {
@@ -12,13 +12,13 @@ indra {
 }
 
 dependencies {
-  paperweight.paperDevBundle("1.20.2-R0.1-SNAPSHOT")
+  paperweight.paperDevBundle(libs.versions.testPluginDevBundle)
 
   implementation(projects.reflectionRemapper)
 
-  implementation(platform("cloud.commandframework:cloud-bom:1.8.4"))
-  implementation("cloud.commandframework", "cloud-paper")
-  implementation("cloud.commandframework", "cloud-minecraft-extras") {
+  implementation(platform(libs.cloud.bom))
+  implementation(libs.cloud.paper)
+  implementation(libs.cloud.minecraft.extras) {
     isTransitive = false // Paper provides adventure
   }
 }
