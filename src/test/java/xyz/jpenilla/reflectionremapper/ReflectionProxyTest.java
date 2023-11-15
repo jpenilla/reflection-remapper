@@ -31,7 +31,7 @@ import xyz.jpenilla.reflectionremapper.proxy.annotation.Type;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ReflectionRemapperTest {
+class ReflectionProxyTest {
   private ReflectionProxyFactory factory() {
     return ReflectionProxyFactory.create(
       ReflectionRemapper.noop(),
@@ -89,13 +89,13 @@ class ReflectionRemapperTest {
     assertEquals("nothing5", proxy.get(() -> "nothing", 5).get());
   }
 
-  @Proxies(className = "xyz.jpenilla.reflectionremapper.ReflectionRemapperTest$PrivateClass")
+  @Proxies(className = "xyz.jpenilla.reflectionremapper.ReflectionProxyTest$PrivateClass")
   interface PrivateClassProxy {
     String secret(Object instance);
 
     String useSecretClass(
       Object instance,
-      @Type(className = "xyz.jpenilla.reflectionremapper.ReflectionRemapperTest$AnotherPrivateClass") Object anotherPrivateClass
+      @Type(className = "xyz.jpenilla.reflectionremapper.ReflectionProxyTest$AnotherPrivateClass") Object anotherPrivateClass
     );
 
     @MethodName("useSecretClass")
@@ -153,7 +153,7 @@ class ReflectionRemapperTest {
     }
   }
 
-  @Proxies(className = "xyz.jpenilla.reflectionremapper.ReflectionRemapperTest$AnotherPrivateClass")
+  @Proxies(className = "xyz.jpenilla.reflectionremapper.ReflectionProxyTest$AnotherPrivateClass")
   interface AnotherPrivateClassProxy {
   }
 

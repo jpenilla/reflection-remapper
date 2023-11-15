@@ -21,7 +21,6 @@ import java.lang.reflect.Proxy;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.framework.qual.DefaultQualifier;
 import xyz.jpenilla.reflectionremapper.ReflectionRemapper;
-import xyz.jpenilla.reflectionremapper.internal.util.Util;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.Proxies;
 
 /**
@@ -53,7 +52,6 @@ public final class ReflectionProxyFactory {
       new Class<?>[]{proxyInterface},
       new ReflectionProxyInvocationHandler<>(
         proxyInterface,
-        Util.findProxiedClass(proxyInterface, this.reflectionRemapper::remapClassName),
         this.reflectionRemapper
       )
     );
