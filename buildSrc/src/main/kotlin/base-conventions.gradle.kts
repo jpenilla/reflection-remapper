@@ -33,7 +33,7 @@ tasks {
   }
   withType<Jar> {
     from(rootProject.file("LICENSE")) {
-      rename { "LICENSE_${rootProject.name}" }
+      rename("LICENSE", "META-INF/LICENSE_${rootProject.name}")
     }
   }
 }
