@@ -139,8 +139,19 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
   }
 
   private void scanInterface(final ReflectionRemapper reflectionRemapper) {
+    Class<?> prevProxy = null;
+    Class<?> prevProxied = null;
+
     for (final Class<?> cls : Util.topDownInterfaceHierarchy(this.interfaceClass)) {
       final Class<?> proxied = Util.findProxiedClass(cls, reflectionRemapper::remapClassName);
+
+      if (prevProxied != null && !prevProxied.isAssignableFrom(proxied)) {
+        throw new IllegalArgumentException(
+          "Reflection proxy interface " + cls.getName() + " proxies " + proxied.getName() + ", and extends from reflection proxy interface "
+            + prevProxy.getName() + " which proxies " + prevProxied.getName() + ", but the proxied types are not compatible."
+        );
+      }
+
       this.scanInterface(
         cls,
         proxied,
@@ -148,6 +159,9 @@ final class ReflectionProxyInvocationHandler<I> implements InvocationHandler {
         fieldName -> reflectionRemapper.remapFieldName(proxied, fieldName),
         (methodName, parameters) -> reflectionRemapper.remapMethodName(proxied, methodName, parameters)
       );
+
+      prevProxied = proxied;
+      prevProxy = cls;
     }
   }
 
