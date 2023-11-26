@@ -11,7 +11,7 @@ mappingsTestDevBundle = "1.20.2-R0.1-SNAPSHOT"
 indra-common = { group = "net.kyori", name = "indra-common", version.ref = "indra" }
 indra-licenser-spotless = { group = "net.kyori", name = "indra-licenser-spotless", version.ref = "indra" }
 indra-publishing-sonatype = { group = "net.kyori", name = "indra-publishing-sonatype", version.ref = "indra" }
-paperweight-userdev = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version = "1.5.9" }
+paperweight-userdev = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version = "1.5.10" }
 
 mappingsTestDevBundle = { module = "io.papermc.paper:dev-bundle", version.ref = "mappingsTestDevBundle" }
 memoryMeasurer = "com.volkhart.memory:measurer:0.2-SNAPSHOT"
@@ -19,7 +19,7 @@ junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.10.1"
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 
 checker-qual = "org.checkerframework:checker-qual:3.40.0"
-mapping-io = { group = "net.fabricmc", name = "mapping-io", version = "0.4.2" }
+mapping-io = { group = "net.fabricmc", name = "mapping-io", version = "0.5.0" }
 
 cloud-bom = { group = "cloud.commandframework", name = "cloud-bom", version = "1.8.4" }
 cloud-paper = { module = "cloud.commandframework:cloud-paper" }

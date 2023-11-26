@@ -109,22 +109,22 @@ final class ReflectionRemapperImpl implements ReflectionRemapper {
       final Map<String, String> fields = new HashMap<>();
       for (final MappingTree.FieldMapping field : cls.getFields()) {
         fields.put(
-          pool.string(field.getName(fromNamespace)),
-          pool.string(field.getName(toNamespace))
+          pool.string(Objects.requireNonNull(field.getName(fromNamespace))),
+          pool.string(Objects.requireNonNull(field.getName(toNamespace)))
         );
       }
 
       final Map<String, String> methods = new HashMap<>();
       for (final MappingTree.MethodMapping method : cls.getMethods()) {
         methods.put(
-          pool.string(methodKey(method.getName(fromNamespace), method.getDesc(toNamespace))),
-          pool.string(method.getName(toNamespace))
+          pool.string(methodKey(Objects.requireNonNull(method.getName(fromNamespace)), Objects.requireNonNull(method.getDesc(toNamespace)))),
+          pool.string(Objects.requireNonNull(method.getName(toNamespace)))
         );
       }
 
       final ClassMapping map = new ClassMapping(
-        cls.getName(toNamespace).replace('/', '.'),
-        cls.getName(fromNamespace).replace('/', '.'),
+        Objects.requireNonNull(cls.getName(toNamespace)).replace('/', '.'),
+        Objects.requireNonNull(cls.getName(fromNamespace)).replace('/', '.'),
         Collections.unmodifiableMap(fields),
         Collections.unmodifiableMap(methods)
       );
