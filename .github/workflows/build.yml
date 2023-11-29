@@ -1,21 +1,29 @@
 name: Build
-on: [ push, pull_request ]
+on:
+  push:
+    branches: [ "**" ]
+    tags-ignore: [ "**" ]
+  pull_request:
+  release:
+    types: [ released ]
 jobs:
   build:
     # Only run on PRs if the source branch is on someone else's repo
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: gradle/wrapper-validation-action@v1
-      - name: "jdk"
+      - name: "checkout git repository"
+        uses: actions/checkout@v4
+      - name: "validate gradle wrapper"
+        uses: gradle/wrapper-validation-action@v1
+      - name: "setup jdk"
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: setup gradle
+      - name: "setup gradle"
         uses: gradle/gradle-build-action@v2
-      - name: "build"
+      - name: "execute gradle build"
         run: ./gradlew build
       - name: "determine status"
         run: |
@@ -24,13 +32,13 @@ jobs:
           else
             echo "STATUS=release" >> $GITHUB_ENV
           fi
-      - name: "publish snapshot"
+      - name: "publish snapshot to sonatype snapshots"
         if: "${{ env.STATUS != 'release' && github.event_name == 'push' && github.ref == 'refs/heads/master' }}"
         run: ./gradlew publish
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: "${{ secrets.SONATYPE_USERNAME }}"
           ORG_GRADLE_PROJECT_sonatypePassword: "${{ secrets.SONATYPE_PASSWORD }}"
-      - name: "publish release"
+      - name: "publish release to maven central"
         if: "${{ env.STATUS == 'release' && github.event_name == 'release' }}"
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
