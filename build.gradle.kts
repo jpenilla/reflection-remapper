@@ -1,5 +1,6 @@
 plugins {
   `build-logic`
+  alias(libs.plugins.shadow)
 }
 
 group = "xyz.jpenilla"
@@ -12,9 +13,7 @@ repositories {
 
 dependencies {
   compileOnlyApi(libs.checker.qual)
-  implementation(libs.mapping.io) {
-    exclude("org.ow2.asm")
-  }
+  implementation(libs.mapping.io)
 
   // testing dependencies
   testImplementation(libs.memoryMeasurer)
@@ -22,4 +21,8 @@ dependencies {
   devBundle(libs.mappingsTestDevBundle)
   testImplementation(libs.junit.jupiter.api)
   testRuntimeOnly(libs.junit.jupiter.engine)
+}
+
+tasks.shadowJar {
+  relocate("net.fabricmc.mappingio", "xyz.jpenilla.reflectionremapper.internal.lib.mappingio")
 }

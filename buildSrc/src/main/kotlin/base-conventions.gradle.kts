@@ -31,7 +31,7 @@ tasks {
       )
     }
   }
-  withType<Jar> {
+  withType<Jar>().configureEach {
     from(rootProject.file("LICENSE")) {
       rename("LICENSE", "META-INF/LICENSE_${rootProject.name}")
     }

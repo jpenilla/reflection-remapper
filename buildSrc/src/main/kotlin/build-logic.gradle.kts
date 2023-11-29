@@ -19,7 +19,7 @@ tasks {
   processTestResources {
     dependsOn(extractMappings)
   }
-  withType<Test> {
+  withType<Test>().configureEach {
     if (!name.contains("Java8")) {
       inputs.files(memoryMeasurer)
       doFirst {
