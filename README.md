@@ -2,14 +2,14 @@
 reflection-remapper is a library to simplify making reflective calls, with specific support for remapped environments.
 
 ## Getting reflection-remapper
-There are currently no release builds.
+Releases are published to [Maven Central](https://central.sonatype.com/artifact/xyz.jpenilla/reflection-remapper).
 
 > <details open>
 > <summary>Using snapshot builds</summary>
 >
-> Snapshot builds are available on the Sonatype snapshots maven repository: `https://s01.oss.sonatype.org/content/repositories/snapshots/`
+> Snapshot builds are available on the Sonatype snapshots Maven repository: `https://s01.oss.sonatype.org/content/repositories/snapshots/`
 >
-> Consult your build tool's documentation for details on adding maven repositories to your project.
+> Consult your build tool's documentation for details on adding Maven repositories to your project.
 > </details>
 
 ### Gradle Kotlin DSL
@@ -17,8 +17,12 @@ There are currently no release builds.
 > <summary>Click to show build.gradle.kts</summary>
 > 
 > ```kotlin
+> repositories {
+>   mavenCentral()
+> }
+> 
 > dependencies {
->   implementation("xyz.jpenilla", "reflection-remapper", "0.1.0-SNAPSHOT")
+>   implementation("xyz.jpenilla:reflection-remapper:0.1.0")
 > }
 > ```
 > </details>
@@ -28,8 +32,12 @@ There are currently no release builds.
 > <summary>Click to show build.gradle</summary>
 > 
 > ```groovy
+> repositories {
+>   mavenCentral()
+> }
+> 
 > dependencies {
->   implementation 'xyz.jpenilla:reflection-remapper:0.1.0-SNAPSHOT'
+>   implementation 'xyz.jpenilla:reflection-remapper:0.1.0'
 > }
 > ```
 > </details>
