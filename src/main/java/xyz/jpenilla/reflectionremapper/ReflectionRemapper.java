@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.function.UnaryOperator;
 import net.fabricmc.mappingio.MappingReader;
 import net.fabricmc.mappingio.tree.MemoryMappingTree;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -106,6 +107,19 @@ public interface ReflectionRemapper {
     }
 
     return this.remapClassName(name);
+  }
+
+  /**
+   * Creates a new reflection remapper that processes class names using the provided
+   * operator before remapping them with this remapper.
+   *
+   * <p>This may be useful when class names must be mangled to avoid relocation.</p>
+   *
+   * @param preprocessor class name preprocessor
+   * @return delegating reflection remapper
+   */
+  default ReflectionRemapper withClassNamePreprocessor(final UnaryOperator<String> preprocessor) {
+    return new ClassNamePreprocessingReflectionRemapper(this, preprocessor);
   }
 
   /**
