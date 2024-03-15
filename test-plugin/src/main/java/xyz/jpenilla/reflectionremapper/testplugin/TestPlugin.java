@@ -17,13 +17,6 @@
  */
 package xyz.jpenilla.reflectionremapper.testplugin;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.minecraft.extras.AudienceProvider;
-import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
-import cloud.commandframework.paper.PaperCommandManager;
 import io.papermc.paper.util.MCUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -33,8 +26,12 @@ import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.DefaultQualifier;
+import org.incendo.cloud.Command;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
+import org.incendo.cloud.paper.PaperCommandManager;
 import xyz.jpenilla.reflectionremapper.ReflectionRemapper;
 import xyz.jpenilla.reflectionremapper.proxy.ReflectionProxyFactory;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.Proxies;
@@ -50,26 +47,26 @@ public final class TestPlugin extends JavaPlugin {
   }
 
   private void registerCommands(final PaperCommandManager<CommandSender> manager) {
-    final Command.Builder<CommandSender> createEndPlatform = manager.commandBuilder("create_end_platform")
+    final Command.Builder<Player> createEndPlatform = manager.commandBuilder("create_end_platform")
       .senderType(Player.class)
       .handler(this::executeCreateEndPlatform);
     manager.command(createEndPlatform);
 
-    final Command.Builder<CommandSender> strikeLightning = manager.commandBuilder("strike_lightning")
+    final Command.Builder<Player> strikeLightning = manager.commandBuilder("strike_lightning")
       .senderType(Player.class)
       .handler(this::executeStrikeLightning);
     manager.command(strikeLightning);
   }
 
-  private void executeCreateEndPlatform(final CommandContext<CommandSender> ctx) {
-    final ServerPlayer serverPlayer = ((CraftPlayer) ctx.getSender()).getHandle();
+  private void executeCreateEndPlatform(final CommandContext<Player> ctx) {
+    final ServerPlayer serverPlayer = ((CraftPlayer) ctx.sender()).getHandle();
     Reflection.SERVER_PLAYER.createEndPlatform(serverPlayer, (ServerLevel) serverPlayer.level(), serverPlayer.blockPosition());
   }
 
-  private void executeStrikeLightning(final CommandContext<CommandSender> ctx) {
-    final ServerPlayer serverPlayer = ((CraftPlayer) ctx.getSender()).getHandle();
+  private void executeStrikeLightning(final CommandContext<Player> ctx) {
+    final ServerPlayer serverPlayer = ((CraftPlayer) ctx.sender()).getHandle();
     final BlockPos lightningTarget = Reflection.SERVER_LEVEL.findLightningTargetAround((ServerLevel) serverPlayer.level(), serverPlayer.blockPosition());
-    ((Player) ctx.getSender()).getWorld().strikeLightning(MCUtil.toLocation(serverPlayer.level(), lightningTarget));
+    ctx.sender().getWorld().strikeLightning(MCUtil.toLocation(serverPlayer.level(), lightningTarget));
   }
 
   public static final class Reflection {
@@ -99,21 +96,11 @@ public final class TestPlugin extends JavaPlugin {
   }
 
   private static PaperCommandManager<CommandSender> createCommandManager(final JavaPlugin plugin) {
-    final PaperCommandManager<CommandSender> manager;
-    try {
-      manager = PaperCommandManager.createNative(plugin, CommandExecutionCoordinator.simpleCoordinator());
-    } catch (final Exception e) {
-      throw new RuntimeException(e);
-    }
+    final PaperCommandManager<CommandSender> manager = PaperCommandManager.createNative(plugin, ExecutionCoordinator.simpleCoordinator());
     manager.registerBrigadier();
-    manager.registerAsynchronousCompletions();
-    final @Nullable CloudBrigadierManager<CommandSender, ?> brigMgr = manager.brigadierManager();
-    if (brigMgr != null) {
-      brigMgr.setNativeNumberSuggestions(false);
-    }
-    new MinecraftExceptionHandler<CommandSender>()
-      .withDefaultHandlers()
-      .apply(manager, AudienceProvider.nativeAudience());
+    MinecraftExceptionHandler.<CommandSender>createNative()
+      .defaultHandlers()
+      .registerTo(manager);
     return manager;
   }
 }

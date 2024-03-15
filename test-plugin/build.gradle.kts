@@ -17,6 +17,7 @@ dependencies {
   implementation(projects.reflectionRemapper)
 
   implementation(platform(libs.cloud.bom))
+  implementation(platform(libs.cloud.minecraft.bom))
   implementation(libs.cloud.paper)
   implementation(libs.cloud.minecraft.extras) {
     isTransitive = false // Paper provides adventure
@@ -30,7 +31,7 @@ tasks {
   shadowJar {
     fun reloc(pkg: String) = relocate(pkg, "xyz.jpenilla.reflectionremapper.testplugin.dependency.$pkg")
     reloc("net.fabricmc.mappingio")
-    reloc("cloud.commandframework")
+    reloc("org.incendo.cloud")
     reloc("io.leangen.geantyref")
   }
   processResources {
