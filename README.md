@@ -22,7 +22,7 @@ Releases are published to [Maven Central](https://central.sonatype.com/artifact/
 > }
 > 
 > dependencies {
->   implementation("xyz.jpenilla:reflection-remapper:0.1.1")
+>   implementation("xyz.jpenilla:reflection-remapper:0.1.2")
 > }
 > ```
 > </details>
@@ -37,7 +37,7 @@ Releases are published to [Maven Central](https://central.sonatype.com/artifact/
 > }
 > 
 > dependencies {
->   implementation 'xyz.jpenilla:reflection-remapper:0.1.1'
+>   implementation 'xyz.jpenilla:reflection-remapper:0.1.2'
 > }
 > ```
 > </details>
