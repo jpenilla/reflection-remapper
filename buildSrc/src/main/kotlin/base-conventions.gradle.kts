@@ -13,9 +13,9 @@ if (project != rootProject) {
 
 indra {
   javaVersions {
-    minimumToolchain(17)
+    minimumToolchain(21)
     target(8)
-    testWith(8, 17)
+    testWith(8, 11, 17, 21)
   }
 }
 

@@ -4,3 +4,4 @@
 build
 /test-plugin/run/
 /.idea/
+.kotlin/
