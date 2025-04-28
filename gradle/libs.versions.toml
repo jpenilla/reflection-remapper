@@ -21,7 +21,7 @@ junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 checker-qual = "org.checkerframework:checker-qual:3.40.0"
 mapping-io = { group = "net.fabricmc", name = "mapping-io", version = "0.5.0" }
 
-cloud-bom = { group = "org.incendo", name = "cloud-bom", version = "2.0.0-beta.4" }
+cloud-bom = { group = "org.incendo", name = "cloud-bom", version = "2.0.0" }
 cloud-minecraft-bom = { group = "org.incendo", name = "cloud-minecraft-bom", version = "2.0.0-beta.5" }
 cloud-paper = { module = "org.incendo:cloud-paper" }
 cloud-minecraft-extras = { module = "org.incendo:cloud-minecraft-extras" }
