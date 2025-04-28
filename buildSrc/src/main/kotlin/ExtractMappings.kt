@@ -25,7 +25,7 @@ abstract class ExtractMappings : DefaultTask() {
     Files.deleteIfExists(out.get().asFile.toPath())
     val bundleZip = devBundleZip.get().asFile
     FileSystems.newFileSystem(URI.create("jar:${bundleZip.toURI()}"), HashMap<String, Any>()).use { fs ->
-      Files.copy(fs.getPath("/data/mojang+yarn-spigot-reobf.tiny"), out.get().asFile.toPath())
+      Files.copy(fs.getPath("/data/mojang-spigot-reobf.tiny"), out.get().asFile.toPath())
     }
   }
 }

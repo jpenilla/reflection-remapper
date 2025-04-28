@@ -34,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.DefaultQualifier;
 
+import static xyz.jpenilla.reflectionremapper.internal.util.Util.firstLine;
 import static xyz.jpenilla.reflectionremapper.internal.util.Util.mojangMapped;
 
 /**
@@ -194,7 +195,11 @@ public interface ReflectionRemapper {
       return noop();
     }
 
-    return forMappings(mappings, MappingNamespace.DEOBF, MappingNamespace.OBF);
+    try (final InputStream inputStream = Files.newInputStream(mappings)) {
+      return forPaperReobfMappings(inputStream);
+    } catch (final IOException e) {
+      throw new RuntimeException("Failed to read mappings.", e);
+    }
   }
 
   /**
@@ -213,7 +218,10 @@ public interface ReflectionRemapper {
       return noop();
     }
 
-    return forMappings(mappings, MappingNamespace.DEOBF, MappingNamespace.OBF);
+    if (firstLine(mappings).contains(MappingNamespace.MOJANG_PLUS_YARN)) {
+      return forMappings(mappings, MappingNamespace.MOJANG_PLUS_YARN, MappingNamespace.SPIGOT);
+    }
+    return forMappings(mappings, MappingNamespace.MOJANG, MappingNamespace.SPIGOT);
   }
 
   /**

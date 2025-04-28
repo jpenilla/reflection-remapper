@@ -21,6 +21,7 @@ dependencies {
   devBundle(libs.mappingsTestDevBundle)
   testImplementation(libs.junit.jupiter.api)
   testRuntimeOnly(libs.junit.jupiter.engine)
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.shadowJar {

@@ -17,11 +17,17 @@
  */
 package xyz.jpenilla.reflectionremapper.internal.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -190,5 +196,17 @@ public final class Util {
     }
 
     return 'L' + clazz.getName().replace('.', '/') + ';';
+  }
+
+  public static String firstLine(final InputStream mappings) {
+    try {
+      mappings.mark(1024);
+      final BufferedReader reader = new BufferedReader(new InputStreamReader(mappings, StandardCharsets.UTF_8));
+      final String line = reader.readLine();
+      mappings.reset();
+      return line;
+    } catch (final IOException e) {
+      throw new UncheckedIOException("Failed to read first line of input stream", e);
+    }
   }
 }

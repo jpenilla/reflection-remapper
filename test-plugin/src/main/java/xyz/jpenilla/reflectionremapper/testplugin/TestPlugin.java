@@ -17,12 +17,12 @@
  */
 package xyz.jpenilla.reflectionremapper.testplugin;
 
-import io.papermc.paper.util.MCUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -31,7 +31,7 @@ import org.incendo.cloud.Command;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
-import org.incendo.cloud.paper.PaperCommandManager;
+import org.incendo.cloud.paper.LegacyPaperCommandManager;
 import xyz.jpenilla.reflectionremapper.ReflectionRemapper;
 import xyz.jpenilla.reflectionremapper.proxy.ReflectionProxyFactory;
 import xyz.jpenilla.reflectionremapper.proxy.annotation.Proxies;
@@ -42,11 +42,11 @@ public final class TestPlugin extends JavaPlugin {
   public void onEnable() {
     Reflection.class.getClassLoader(); // init Reflection
 
-    final PaperCommandManager<CommandSender> commandManager = createCommandManager(this);
+    final LegacyPaperCommandManager<CommandSender> commandManager = createCommandManager(this);
     this.registerCommands(commandManager);
   }
 
-  private void registerCommands(final PaperCommandManager<CommandSender> manager) {
+  private void registerCommands(final LegacyPaperCommandManager<CommandSender> manager) {
     final Command.Builder<Player> createEndPlatform = manager.commandBuilder("create_end_platform")
       .senderType(Player.class)
       .handler(this::executeCreateEndPlatform);
@@ -66,7 +66,8 @@ public final class TestPlugin extends JavaPlugin {
   private void executeStrikeLightning(final CommandContext<Player> ctx) {
     final ServerPlayer serverPlayer = ((CraftPlayer) ctx.sender()).getHandle();
     final BlockPos lightningTarget = Reflection.SERVER_LEVEL.findLightningTargetAround((ServerLevel) serverPlayer.level(), serverPlayer.blockPosition());
-    ctx.sender().getWorld().strikeLightning(MCUtil.toLocation(serverPlayer.level(), lightningTarget));
+    ctx.sender().getWorld().strikeLightning(new Location(
+      serverPlayer.level().getWorld(), lightningTarget.getX(), lightningTarget.getY(), lightningTarget.getZ()));
   }
 
   public static final class Reflection {
@@ -95,8 +96,8 @@ public final class TestPlugin extends JavaPlugin {
     void createEndPlatform(ServerPlayer instance, ServerLevel world, BlockPos centerPos);
   }
 
-  private static PaperCommandManager<CommandSender> createCommandManager(final JavaPlugin plugin) {
-    final PaperCommandManager<CommandSender> manager = PaperCommandManager.createNative(plugin, ExecutionCoordinator.simpleCoordinator());
+  private static LegacyPaperCommandManager<CommandSender> createCommandManager(final JavaPlugin plugin) {
+    final LegacyPaperCommandManager<CommandSender> manager = LegacyPaperCommandManager.createNative(plugin, ExecutionCoordinator.simpleCoordinator());
     manager.registerBrigadier();
     MinecraftExceptionHandler.<CommandSender>createNative()
       .defaultHandlers()

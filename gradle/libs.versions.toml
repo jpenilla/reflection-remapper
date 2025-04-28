@@ -4,8 +4,8 @@ shadow = { id = "com.gradleup.shadow", version = "8.3.6" }
 
 [versions]
 indra = "3.1.3"
-testPluginDevBundle = "1.20.2-R0.1-SNAPSHOT"
-mappingsTestDevBundle = "1.20.2-R0.1-SNAPSHOT"
+testPluginDevBundle = "1.21.5-R0.1-SNAPSHOT"
+mappingsTestDevBundle = "1.21.5-R0.1-SNAPSHOT"
 
 [libraries]
 indra-common = { group = "net.kyori", name = "indra-common", version.ref = "indra" }

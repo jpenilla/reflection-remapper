@@ -1,10 +1,16 @@
+import io.papermc.paperweight.attribute.DevBundleOutput
+
 plugins {
   id("base-conventions")
   id("publishing-conventions")
   id("net.kyori.indra.publishing.sonatype")
 }
 
-val devBundle: Configuration by configurations.creating
+val devBundle: Configuration by configurations.creating {
+  attributes {
+    attribute(DevBundleOutput.ATTRIBUTE, objects.named(DevBundleOutput.ZIP))
+  }
+}
 val memoryMeasurer: Configuration by configurations.creating
 
 tasks {
