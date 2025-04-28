@@ -22,7 +22,7 @@ checker-qual = "org.checkerframework:checker-qual:3.40.0"
 mapping-io = { group = "net.fabricmc", name = "mapping-io", version = "0.7.1" }
 
 cloud-bom = { group = "org.incendo", name = "cloud-bom", version = "2.0.0" }
-cloud-minecraft-bom = { group = "org.incendo", name = "cloud-minecraft-bom", version = "2.0.0-beta.10" }
+cloud-minecraft-bom = { group = "org.incendo", name = "cloud-minecraft-bom", version = "2.0.0-SNAPSHOT" }
 cloud-paper = { module = "org.incendo:cloud-paper" }
 cloud-minecraft-extras = { module = "org.incendo:cloud-minecraft-extras" }
 
