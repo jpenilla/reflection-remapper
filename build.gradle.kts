@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "xyz.jpenilla"
-version = "0.1.2"
+version = "0.1.3-SNAPSHOT"
 description = "reflection-remapper is a library to simplify making reflective calls, with specific support for remapped environments."
 
 repositories {
