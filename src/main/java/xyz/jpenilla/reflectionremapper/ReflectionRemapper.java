@@ -17,6 +17,7 @@
  */
 package xyz.jpenilla.reflectionremapper;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -218,10 +219,13 @@ public interface ReflectionRemapper {
       return noop();
     }
 
-    if (firstLine(mappings).contains(MappingNamespace.MOJANG_PLUS_YARN)) {
-      return forMappings(mappings, MappingNamespace.MOJANG_PLUS_YARN, MappingNamespace.SPIGOT);
+    final InputStream bufferedMappings = mappings instanceof BufferedInputStream
+      ? mappings
+      : new BufferedInputStream(mappings);
+    if (firstLine(bufferedMappings).contains(MappingNamespace.MOJANG_PLUS_YARN)) {
+      return forMappings(bufferedMappings, MappingNamespace.MOJANG_PLUS_YARN, MappingNamespace.SPIGOT);
     }
-    return forMappings(mappings, MappingNamespace.MOJANG, MappingNamespace.SPIGOT);
+    return forMappings(bufferedMappings, MappingNamespace.MOJANG, MappingNamespace.SPIGOT);
   }
 
   /**
