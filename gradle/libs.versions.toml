@@ -15,7 +15,7 @@ paperweight-userdev = { group = "io.papermc.paperweight.userdev", name = "io.pap
 
 mappingsTestDevBundle = { module = "io.papermc.paper:dev-bundle", version.ref = "mappingsTestDevBundle" }
 memoryMeasurer = "com.volkhart.memory:measurer:0.2-SNAPSHOT"
-junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.13.2"
+junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.13.3"
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 
 checker-qual = "org.checkerframework:checker-qual:3.49.4"
