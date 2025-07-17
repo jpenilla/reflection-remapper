@@ -3,7 +3,7 @@ import io.papermc.paperweight.attribute.DevBundleOutput
 plugins {
   id("base-conventions")
   id("publishing-conventions")
-  id("net.kyori.indra.publishing.sonatype")
+  id("org.incendo.cloud-build-logic.publishing.root-project")
 }
 
 val devBundle: Configuration by configurations.creating {
@@ -36,8 +36,4 @@ tasks {
     }
     dependsOn(extractMappings)
   }
-}
-
-indraSonatype {
-  useAlternateSonatypeOSSHost("s01")
 }

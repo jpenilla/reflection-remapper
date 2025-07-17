@@ -1,6 +1,9 @@
+import org.incendo.cloudbuildlogic.jmp
+
 plugins {
   id("base-conventions")
   id("net.kyori.indra.publishing")
+  id("org.incendo.cloud-build-logic.publishing")
 }
 
 indra {
@@ -9,11 +12,7 @@ indra {
   configurePublications {
     pom {
       developers {
-        developer {
-          id.set("jmp")
-          name.set("Jason Penilla")
-          timezone.set("America/Phoenix")
-        }
+        jmp()
       }
     }
   }

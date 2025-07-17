@@ -10,8 +10,8 @@ mappingsTestDevBundle = "1.21.5-R0.1-SNAPSHOT"
 [libraries]
 indra-common = { group = "net.kyori", name = "indra-common", version.ref = "indra" }
 indra-licenser-spotless = { group = "net.kyori", name = "indra-licenser-spotless", version.ref = "indra" }
-indra-publishing-sonatype = { group = "net.kyori", name = "indra-publishing-sonatype", version.ref = "indra" }
 paperweight-userdev = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version = "2.0.0-beta.17" }
+cloud-build-logic = { module = "org.incendo:cloud-build-logic", version = "0.0.17" }
 
 mappingsTestDevBundle = { module = "io.papermc.paper:dev-bundle", version.ref = "mappingsTestDevBundle" }
 memoryMeasurer = "com.volkhart.memory:measurer:0.2-SNAPSHOT"
