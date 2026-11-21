@@ -60,12 +60,12 @@ public final class TestPlugin extends JavaPlugin {
 
   private void executeCreateEndPlatform(final CommandContext<Player> ctx) {
     final ServerPlayer serverPlayer = ((CraftPlayer) ctx.sender()).getHandle();
-    Reflection.SERVER_PLAYER.createEndPlatform(serverPlayer, (ServerLevel) serverPlayer.level(), serverPlayer.blockPosition());
+    Reflection.SERVER_PLAYER.createEndPlatform(serverPlayer, serverPlayer.level(), serverPlayer.blockPosition());
   }
 
   private void executeStrikeLightning(final CommandContext<Player> ctx) {
     final ServerPlayer serverPlayer = ((CraftPlayer) ctx.sender()).getHandle();
-    final BlockPos lightningTarget = Reflection.SERVER_LEVEL.findLightningTargetAround((ServerLevel) serverPlayer.level(), serverPlayer.blockPosition());
+    final BlockPos lightningTarget = Reflection.SERVER_LEVEL.findLightningTargetAround(serverPlayer.level(), serverPlayer.blockPosition());
     ctx.sender().getWorld().strikeLightning(new Location(
       serverPlayer.level().getWorld(), lightningTarget.getX(), lightningTarget.getY(), lightningTarget.getZ()));
   }

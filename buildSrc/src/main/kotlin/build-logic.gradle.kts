@@ -6,12 +6,11 @@ plugins {
   id("org.incendo.cloud-build-logic.publishing.root-project")
 }
 
-val devBundle: Configuration by configurations.creating {
+val devBundle = configurations.create("devBundle") {
   attributes {
     attribute(DevBundleOutput.ATTRIBUTE, objects.named(DevBundleOutput.ZIP))
   }
 }
-val memoryMeasurer: Configuration by configurations.creating
 
 tasks {
   val mappingsDir = layout.buildDirectory.dir("test_mappings")
@@ -26,14 +25,11 @@ tasks {
     dependsOn(extractMappings)
   }
   withType<Test>().configureEach {
-    if (!name.contains("Java8")) {
-      inputs.files(memoryMeasurer)
-      doFirst {
-        jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
-        jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
-        jvmArgs("-javaagent:${memoryMeasurer.asFileTree.singleFile.path}")
-      }
-    }
     dependsOn(extractMappings)
+  }
+  withType<Jar>().configureEach {
+    from(rootProject.file("LICENSE")) {
+      rename("LICENSE", "META-INF/LICENSE_${rootProject.name}")
+    }
   }
 }

@@ -16,8 +16,6 @@ dependencies {
   implementation(libs.mapping.io)
 
   // testing dependencies
-  testImplementation(libs.memoryMeasurer)
-  memoryMeasurer(libs.memoryMeasurer)
   devBundle(libs.mappingsTestDevBundle)
   testImplementation(libs.junit.jupiter.api)
   testRuntimeOnly(libs.junit.jupiter.engine)

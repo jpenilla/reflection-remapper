@@ -1,28 +1,27 @@
 [plugins]
 run-paper = { id = "xyz.jpenilla.run-paper", version = "3.0.0" }
-shadow = { id = "com.gradleup.shadow", version = "8.3.8" }
+shadow = { id = "com.gradleup.shadow", version = "9.6.1" }
 
 [versions]
-indra = "3.2.0"
-testPluginDevBundle = "1.21.5-R0.1-SNAPSHOT"
-mappingsTestDevBundle = "1.21.5-R0.1-SNAPSHOT"
+indra = "4.1.0"
+testPluginDevBundle = "1.21.11-R0.1-SNAPSHOT"
+mappingsTestDevBundle = "1.21.11-R0.1-SNAPSHOT"
 
 [libraries]
 indra-common = { group = "net.kyori", name = "indra-common", version.ref = "indra" }
 indra-licenser-spotless = { group = "net.kyori", name = "indra-licenser-spotless", version.ref = "indra" }
-paperweight-userdev = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version = "2.0.0-beta.17" }
-cloud-build-logic = { module = "org.incendo:cloud-build-logic", version = "0.0.17" }
+paperweight-userdev = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version = "2.0.0-beta.24" }
+cloud-build-logic = { module = "org.incendo:cloud-build-logic", version = "0.0.23" }
 
 mappingsTestDevBundle = { module = "io.papermc.paper:dev-bundle", version.ref = "mappingsTestDevBundle" }
-memoryMeasurer = "com.volkhart.memory:measurer:0.2-SNAPSHOT"
-junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.13.4"
+junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.14.4"
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 
-checker-qual = "org.checkerframework:checker-qual:3.49.5"
-mapping-io = { group = "net.fabricmc", name = "mapping-io", version = "0.7.1" }
+checker-qual = "org.checkerframework:checker-qual:3.55.1"
+mapping-io = { group = "net.fabricmc", name = "mapping-io", version = "0.9.2" }
 
-cloud-bom = { group = "org.incendo", name = "cloud-bom", version = "2.0.0" }
-cloud-minecraft-bom = { group = "org.incendo", name = "cloud-minecraft-bom", version = "2.0.0-beta.10" }
+cloud-bom = { group = "org.incendo", name = "cloud-bom", version = "2.1.0" }
+cloud-minecraft-bom = { group = "org.incendo", name = "cloud-minecraft-bom", version = "2.0.1" }
 cloud-paper = { module = "org.incendo:cloud-paper" }
 cloud-minecraft-extras = { module = "org.incendo:cloud-minecraft-extras" }
 
