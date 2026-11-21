@@ -17,7 +17,7 @@ mappingsTestDevBundle = { module = "io.papermc.paper:dev-bundle", version.ref = 
 junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.14.4"
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 
-checker-qual = "org.checkerframework:checker-qual:3.55.1"
+checker-qual = "org.checkerframework:checker-qual:4.4.0"
 mapping-io = { group = "net.fabricmc", name = "mapping-io", version = "0.9.2" }
 
 cloud-bom = { group = "org.incendo", name = "cloud-bom", version = "2.1.0" }
