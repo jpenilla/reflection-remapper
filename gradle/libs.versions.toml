@@ -14,7 +14,7 @@ paperweight-userdev = { group = "io.papermc.paperweight.userdev", name = "io.pap
 cloud-build-logic = { module = "org.incendo:cloud-build-logic", version = "0.0.23" }
 
 mappingsTestDevBundle = { module = "io.papermc.paper:dev-bundle", version.ref = "mappingsTestDevBundle" }
-junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.14.4"
+junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.14.5"
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 
 checker-qual = "org.checkerframework:checker-qual:3.55.1"
